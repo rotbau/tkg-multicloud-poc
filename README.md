@@ -11,11 +11,11 @@ Because we have internet connectivity from our vsphere and jumpbox environments 
 
 ## Quicklinks
 
-1. Working with TKG CLI[#working-with-tkg-cli]
-2. Working with the TKG Management cluster[#working-with-the-tkg-management-cluster]
-3. Creating TKG Workload clusters[#creating-tkg-workload-clusters]
-4. Working with TKG Workload clusters[#working-with-tkg-workload-clusters]
-5. Deploying test applications
+1. [Working with TKG CLI](#working-with-tkg-cli)
+2. [Working with the TKG Management cluster](#working-with-the-tkg-management-cluster)
+3. [Creating TKG Workload clusters](#creating-tkg-workload-clusters)
+4. [Working with TKG Workload clusters](#working-with-tkg-workload-clusters)
+5. [Deploying test applications]()
 
 ## Documentation
 
