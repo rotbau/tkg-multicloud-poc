@@ -9,7 +9,9 @@ Assumptions:
 
 Because we have internet connectivity from our vsphere and jumpbox environments images will be pulled from the public VMware repository at registry.tkg.vmware.run
 
+
 ## Quicklinks
+
 
 1. [Working with TKG CLI](#working-with-tkg-cli)
 2. [Working with the TKG Management cluster](#working-with-the-tkg-management-cluster)
@@ -17,13 +19,17 @@ Because we have internet connectivity from our vsphere and jumpbox environments 
 4. [Working with TKG Workload clusters](#working-with-tkg-workload-clusters)
 5. [Deploying test applications]()
 
+
 ## Documentation
+
 
 This POC guide is meant to supplement the official VMware documentation.  Always consult the latest VMware documentation.
 
 https://docs.vmware.com/en/VMware-Tanzu-Kubernetes-Grid/1.2/vmware-tanzu-kubernetes-grid-12/GUID-index.html
 
+
 ## Jumpbox Requirements
+
 
 Its best practice to have a management jumpbox to use for day to day operation of TKG.  This jumpbox is used as the intial bootstrap environment when configuring your TKG management clusters on-premise or in the cloud.  TKG creates a temporary management cluster using Kubernetes in Docker (KIND) on the jumpbox.  It will use the temporary management cluster running in KIND to deploy a permanent management cluster on the cloud infrastructure (vSphere, AWS, Azure, VMC, etc).  It also holds the configuration files for your managment clusters, the TKG cli as well as the admin kube config file.
 
@@ -64,7 +70,9 @@ sudo mv kapp* /usr/local/share/kapp
 sudo mv imgpkg* /usr/local/share/imgpkg
 sudo mv ytt* /usr/local/share/ytt
 ```
+
 ## vSphere Infrastructure Prepration
+
 
 - vCenter >= 6.7u3 or 7.0
 - DHCP subnet presented as vCenter Portgroup (VSS/VDS) for Kubernetes Management and Workload Clusters
@@ -78,7 +86,9 @@ sudo mv ytt* /usr/local/share/ytt
 - Import OVA into vCenter - leave name as is
 - Convert VM to Template
 
+
 ## AWS EC2 Infrastructure Perparation
+
 
 - Access key and access key secret for an active AWS account
 - Your AWS account must have Administrator privileges
@@ -89,7 +99,9 @@ sudo mv ytt* /usr/local/share/ytt
 - Traffic allowed on port TCP 6443 from local bootstrap (jumpbox) and AWS
 - Traffic allowed on port TCP 443 from local bootstrap and VMare registry (registry.tkg.vmware.run)
 
+
 ## Azure Infrastructure Requirements
+
 
 - Microsoft Azure account
     - permissions to deploy and app
@@ -105,11 +117,15 @@ sudo mv ytt* /usr/local/share/ytt
 - Jumpbox is required to be located in VMC or AVS environment.  Prepare using same requirements as listed [Jumpbox Requirements](#jumpbox-requirements) section.
 - Follow official documentation for additional preparation steps https://docs.vmware.com/en/VMware-Tanzu-Kubernetes-Grid/1.2/vmware-tanzu-kubernetes-grid-12/GUID-prepare-maas.html#prep-vmc
 
+
 ## Management Cluster Installation
+
 
 Follow official documentation [linked here](#documentation)
 
-## Working with TKG cki
+
+## Working with TKG cli
+
 
 From your jumpbox issue `tkg` from the command line.  This will show you all of the commands available from the TKG CLI.
 
