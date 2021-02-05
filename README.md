@@ -9,6 +9,14 @@ Assumptions:
 
 Because we have internet connectivity from our vsphere and jumpbox environments images will be pulled from the public VMware repository at registry.tkg.vmware.run
 
+## Quicklinks
+
+1. Working with TKG CLI[#working-with-tkg-cli]
+2. Working with the TKG Management cluster[#working-with-the-tkg-management-cluster]
+3. Creating TKG Workload clusters[#creating-tkg-workload-clusters]
+4. Working with TKG Workload clusters[#working-with-tkg-workload-clusters]
+5. Deploying test applications
+
 ## Documentation
 
 This POC guide is meant to supplement the official VMware documentation.  Always consult the latest VMware documentation.
@@ -101,7 +109,7 @@ sudo mv ytt* /usr/local/share/ytt
 
 Follow official documentation [linked here](#documentation)
 
-## Working with TKG CLI
+## Working with TKG cki
 
 From your jumpbox issue `tkg` from the command line.  This will show you all of the commands available from the TKG CLI.
 
@@ -109,10 +117,11 @@ Reference Documentation: https://docs.vmware.com/en/VMware-Tanzu-Kubernetes-Grid
 
 ## Working with the TKG Management cluster
 
-After you install the management cluster(s) for the desired environments.  You can use the TKG CLI to view TKG management clusters and create and view TKG workload clusters. 
+After you install the management cluster(s) for the desired environments.  You can use the TKG cli to view TKG management clusters and create and view TKG workload clusters. 
 
 All comands executed from jumpbox where tkg cli is installed
 
+### View and Select TKG management clusters using TKG cli
 - View TKG management clusters
     `tkg get mc` to view management clusters
     You will see all TKG management clusters you've installed from this jumpbox.  The management cluster with the asterisk is the currently set cluster.
@@ -129,7 +138,7 @@ All comands executed from jumpbox where tkg cli is installed
 
     ![alt text](/img/tkg-set-mc.png)
 
-## Accessing TKG Managemnt cluster nodes using kubectl
+### Accessing TKG managemnt cluster nodes using kubectl
 
 By default during installation of the Management cluster, the credentials are added to the jumpbox kubeconfig file (~/.kube/config).  You can access the management cluster nodes using kubectl.
 
@@ -193,7 +202,8 @@ Once you have your TKG management cluster created you can create TKG workload cl
 
 **Export credentials to separate kubeconfig file**
 
-`tkg get credentials test-cluster --kubeconfig tkgkubeconfig`  Note: if you use this you will need to specify the kubeconfig file on all kubectl commands `kubecctl --kubeconfig tkgkubeconfig {command}`
+`tkg get credentials test-cluster --kubeconfig tkgkubeconfig`  
+**Note:** if you export to separate file you need to specify the kubeconfig file on all kubectl commands `kubecctl --kubeconfig tkgkubeconfig {command}`
 
 ### Accessing TKG workload cluster using kubectl
 
