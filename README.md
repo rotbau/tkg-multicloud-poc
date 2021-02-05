@@ -8,7 +8,7 @@ Assumptions:
 3. Internet connectivity from jumpbox and vsphere environment
 4. Perimeter firewall is not doing SSL cracking / Cert spoofing for public URLs.  If your firewall is doing this you will need to run an airgap install instead https://gist.github.com/rotbau/a90f79473326a7bd3aeb3afa05a01ab3
 
-Because we have internet connectivity from our vsphere and jumpbox environments images will be pulled from the public VMware repository at URL
+Because we have internet connectivity from our vsphere and jumpbox environments images will be pulled from the public VMware repository at registry.tkg.vmware.run
 
 ## Documentation
 
@@ -16,19 +16,7 @@ This POC guide is meant to supplement the official VMware documentation.  Always
 
 https://docs.vmware.com/en/VMware-Tanzu-Kubernetes-Grid/1.2/vmware-tanzu-kubernetes-grid-12/GUID-index.html
 
-
-
-## Pre-requisites - vSphere
-
-- Jumpbox
-- vCenter >= 6.7u3 or 7.0
-- DHCP subnet presented as vCenter Portgroup (VSS/VDS) for Kubernetes Management and Workload Clusters
-    - Recommend at least a /26
-    - Set aside at least 10 IPs that are part of this subnet (excluded from DHCP scope) that can be manually assigned for Kubernetes API VIP or Application VIP
-    - Example (Subnet 192.168.50.0/24, DHCP Scope 192.168.50.10-192.168.50.200, Usable IPs for VIP or LB 192.168.50.201-254)
-- Kubernetes node OVAs imported to vCenter and coverted to a template
-
-## Jumpbox Requirements - vSphere and Public Cloud
+## Jumpbox Requirements
 
 Its best practice to have a management jumpbox to use for day to day operation of TKG.  This jumpbox is used as the intial bootstrap environment when configuring your TKG management clusters on-premise or in the cloud.  TKG creates a temporary management cluster using Kubernetes in Docker (KIND) on the jumpbox.  It will use the temporary management cluster running in KIND to deploy a permanent management cluster on the cloud infrastructure (vSphere, AWS, Azure, VMC, etc).  It also holds the configuration files for your managment clusters, the TKG cli as well as the admin kube config file.
 
@@ -37,7 +25,7 @@ I strongly recommend a Linux VM or MacOS for your jumpbox, however Windows can b
 - Linux, Windows or MacOS 
 - Minimum 6 GB of RAM
 - Minimum 2 vCPU (or 2 cores)
-- >= 200 GB of Disk
+- 200 GB of Disk
 - Desktop Environment recommended for Linux VMs but not required (Gnome, Unity, KDE, MATE, etc)
 - Docker CE or Docker Desktop depending on OS (Note RHEL doesn't support Docker CE) - https://docs.docker.com/engine/install/
 - System time synchronized with NTP
@@ -71,6 +59,11 @@ sudo mv ytt* /usr/local/share/ytt
 ```
 ## vSphere Infrastructure Prepration
 
+- vCenter >= 6.7u3 or 7.0
+- DHCP subnet presented as vCenter Portgroup (VSS/VDS) for Kubernetes Management and Workload Clusters
+    - Recommend at least a /26
+    - Set aside at least 10 IPs that are part of this subnet (excluded from DHCP scope) that can be manually assigned for Kubernetes API VIP or Application VIP
+    - Example (Subnet 192.168.50.0/24, DHCP Scope 192.168.50.10-192.168.50.200, Usable IPs for VIP or LB 192.168.50.201-254)
 - Create Resource Group in vSphere Cluster for TKG VMs - leave settings at default
 - Create VM Folder for TKG VMs and Templates 
 - Download Photon v3 Kubernetes v1.19.3 OVA - https://www.vmware.com/go/get-tkg
@@ -102,7 +95,7 @@ sudo mv ytt* /usr/local/share/ytt
 
 ## VMC on AWS or Azure VMware Solution
 
-- Jumpbox is required to be located in VMC or AVS environment.  Prepare using same requirements as listed [Jumpbox Requirements](## Jumpbox Requirements - vSphere and Public Cloud) section.
+- Jumpbox is required to be located in VMC or AVS environment.  Prepare using same requirements as listed [Jumpbox Requirements](#jumpbox-requirements) section.
 - Follow official documentation for additional preparation steps https://docs.vmware.com/en/VMware-Tanzu-Kubernetes-Grid/1.2/vmware-tanzu-kubernetes-grid-12/GUID-prepare-maas.html#prep-vmc
 
 
