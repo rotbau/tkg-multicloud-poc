@@ -101,22 +101,60 @@ sudo mv ytt* /usr/local/share/ytt
 
 Follow official documentation [linked here](#documentation)
 
+## Working with TKG CLI
+
+From your jumpbox issue `tkg` from the command line.  This will show you all of the commands available from the TKG CLI.
+
+Reference Documentation: https://docs.vmware.com/en/VMware-Tanzu-Kubernetes-Grid/1.2/vmware-tanzu-kubernetes-grid-12/GUID-tkg-cli-reference.html
+
 ## Working with the TKG Management cluster
 
-After you install the management cluster(s) for the desired environments.  You can use the TKG CLI to view TKG management clusters and create and view TKG workload clusters. All comand executed from jumpbox  
+After you install the management cluster(s) for the desired environments.  You can use the TKG CLI to view TKG management clusters and create and view TKG workload clusters. 
+
+All comands executed from jumpbox where tkg cli is installed
 
 - View TKG management clusters
     `tkg get mc` to view management clusters
     You will see all TKG management clusters you've installed from this jumpbox.  The management cluster with the asterisk is the currently set cluster.
 
-    ![alt text](https://github.com/rotbau/tkg-multicloud-poc/blob/master/img/tkg-get-mc.png) "tkg get mc")
+    ![alt text](/img/tkg-get-mc.png)
 
 - Set TKG mangement cluster 
     `tkg set mc tkg-mgmt` will set the mc context for the TKG cli.  Any further TKG commands you run will be executed by the selected TKG management cluster.
 
-    ![alt text](https://github.com/rotbau/tkg-multicloud-poc/blob/master/img/tkg-set-mc.png) "tkg set mc")
+    ![alt text](/img/tkg-set-mc.png)
 
 - View TKG workload clusters managed by selected TKG management cluster
     `tkg get clusters` or `tkg get clusters --include-management-cluster`
-    
-    ![alt text](https://github.com/rotbau/tkg-multicloud-poc/blob/master/img/tkg-set-mc.png) "tkg get clusters")
+
+    ![alt text](/img/tkg-set-mc.png)
+
+## Accessing TKG Managemnt cluster nodes using kubectl
+
+By default during installation of the Management cluster, the credentials are added to the jumpbox kubeconfig file (~/.kube/config).  You can access the management cluster nodes using kubectl.
+
+- Set kubectl cli context
+`kubectl config use-context [mgmt-cluster-name]`
+
+example for tkg-mgmt management cluster name
+
+`kubectl config use-context tkg-mgmt-admin@tkg-mgmt`
+
+![alt text](/img/kubectl-config.png)
+
+- View nodes
+`kubectl get nodes`
+
+![alt text](/img/kubectl-get-nodes.png)
+
+- View namespaces
+`kubectl get ns`
+
+![alt text](/img/kubectl-get-ns.png)
+
+- View all pods
+`kubectl get pods -A`
+
+- View pods in a specific namespace
+`kubectl get pods -n kube-system`
+
