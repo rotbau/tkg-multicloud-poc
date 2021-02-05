@@ -183,16 +183,25 @@ Once you have your TKG management cluster created you can create TKG workload cl
 
 ## Working with TKG Workload clusters
 
-### Accessing TKG workload cluster with kubectl
+### Exporting TKG workload cluster credentials
 
-- Get credentials to workload cluster for the first time.  You can either have the credentials merged into the default kubeconfig file in ~/.kube/config or have it exported to a separate file.
+1. Get credentials to workload cluster for the first time.  You can either have the credentials merged into the default kubeconfig file in ~/.kube/config or have it exported to a separate file.
 
 **Merge credentials to existing ~/.kube/config**
 
-    `tkg get credentials test-cluster`
+`tkg get credentials test-cluster`
 
 **Export credentials to separate kubeconfig file**
 
-    `tkg get credentials test-cluster --kubeconfig tkgkubeconfig`
+`tkg get credentials test-cluster --kubeconfig tkgkubeconfig`  Note: if you use this you will need to specify the kubeconfig file on all kubectl commands `kubecctl --kubeconfig tkgkubeconfig {command}`
 
+### Accessing TKG workload cluster using kubectl
 
+1. Set kubectl context to workload cluster
+`kubectl config set-context test-cluster`
+2. View nodes
+`kubectl get nodes`
+3. View namespaces
+`kubectl get ns`
+4. View Pods
+`kubectl get pods` or `kubectl get pods -A` or `kubectl get pods -n {namespace}`
