@@ -4,7 +4,6 @@ This guide covers some basic POC pre-requisites and general setup for Tanzu Kube
 Assumptions:
 
 1. TKG 1.2+
-2. vSphere environment
 3. Internet connectivity from jumpbox and vsphere environment
 4. Perimeter firewall is not doing SSL cracking / Cert spoofing for public URLs.  If your firewall is doing this you will need to run an airgap install instead https://gist.github.com/rotbau/a90f79473326a7bd3aeb3afa05a01ab3
 
@@ -98,4 +97,20 @@ sudo mv ytt* /usr/local/share/ytt
 - Jumpbox is required to be located in VMC or AVS environment.  Prepare using same requirements as listed [Jumpbox Requirements](#jumpbox-requirements) section.
 - Follow official documentation for additional preparation steps https://docs.vmware.com/en/VMware-Tanzu-Kubernetes-Grid/1.2/vmware-tanzu-kubernetes-grid-12/GUID-prepare-maas.html#prep-vmc
 
+## Management Cluster Installation
 
+Follow official documentation [linked here](#documentation)
+
+## Working with the TKG Management cluster
+
+After you install the management cluster(s) for the desired environments.  You can use the TKG CLI to view TKG management clusters and create and view TKG workload clusters. All comand executed from jumpbox  
+
+- View TKG management clusters
+    `tkg get mc` to view management clusters
+    You will see all TKG management clusters you've installed from this jumpbox
+
+- Select TKG mangement cluster
+    `tkg set mc tkg-mgmt` will set the mc context for the TKG cli.  Any further TKG commands you run will be executed by the selected TKG management cluster
+
+- View TKG workload clusters managed by selected TKG management cluster
+    `tkg get clusters` or `tkg get clusters --include-management-cluster`
