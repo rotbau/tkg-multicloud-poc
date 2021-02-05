@@ -107,10 +107,13 @@ After you install the management cluster(s) for the desired environments.  You c
 
 - View TKG management clusters
     `tkg get mc` to view management clusters
-    You will see all TKG management clusters you've installed from this jumpbox
+    You will see all TKG management clusters you've installed from this jumpbox.  The management cluster with the asterisk is the currently set cluster.
+    ![alt text](https://github.com/rotbau/tkg-multicloud-poc/blob/master/img/tkg-get-mc.png) "tkg get mc")
 
-- Select TKG mangement cluster
+- Set TKG mangement cluster 
     `tkg set mc tkg-mgmt` will set the mc context for the TKG cli.  Any further TKG commands you run will be executed by the selected TKG management cluster
+    ![alt text](https://github.com/rotbau/tkg-multicloud-poc/blob/master/img/tkg-set-mc.png) "tkg set mc")
 
 - View TKG workload clusters managed by selected TKG management cluster
     `tkg get clusters` or `tkg get clusters --include-management-cluster`
+    ![alt text](https://github.com/rotbau/tkg-multicloud-poc/blob/master/img/tkg-set-mc.png) "tkg get clusters")
