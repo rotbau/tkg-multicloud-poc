@@ -134,27 +134,65 @@ All comands executed from jumpbox where tkg cli is installed
 By default during installation of the Management cluster, the credentials are added to the jumpbox kubeconfig file (~/.kube/config).  You can access the management cluster nodes using kubectl.
 
 - Set kubectl cli context
-`kubectl config use-context [mgmt-cluster-name]`
+    `kubectl config use-context [mgmt-cluster-name]`
 
 example for tkg-mgmt management cluster name
 
-`kubectl config use-context tkg-mgmt-admin@tkg-mgmt`
+    `kubectl config use-context tkg-mgmt-admin@tkg-mgmt`
 
-![alt text](/img/kubectl-config.png)
+    ![alt text](/img/kubectl-config.png)
 
 - View nodes
-`kubectl get nodes`
+    `kubectl get nodes`
 
-![alt text](/img/kubectl-get-nodes.png)
+    ![alt text](/img/kubectl-get-nodes.png)
 
 - View namespaces
-`kubectl get ns`
+    `kubectl get ns`
 
-![alt text](/img/kubectl-get-ns.png)
+    ![alt text](/img/kubectl-get-ns.png)
 
 - View all pods
-`kubectl get pods -A`
+    `kubectl get pods -A`
 
 - View pods in a specific namespace
-`kubectl get pods -n kube-system`
+    `kubectl get pods -n kube-system`
+
+## Creating TKG Workload clusters
+
+Once you have your TKG management cluster created you can create TKG workload clusters for your applications.  You can leverage the TKG cli to create clusters.
+
+- Set TKG management cluster if you have multiple management clusters.  Ignore if you only have a single TKG management cluster
+- Create TKG cluster from dev plan (single control plane node and single worker node)
+
+    `tkg create cluster test-cluster -p dev --vsphere-controlplane-endpoint 172.31.3.80`
+
+    *note the controlplane IP is an IP address from the same dhcp network that your nodes are deployed on but outside the dhcp scope.  This IP is used by kube-vip to provide a reliable IP to the workload clusters kubernetes API*
+
+    ![alt text](/img/tkg-create-cluster.png)
+
+- Create a TKG cluster from prod plan with custom node size and number of worker nodes (3 control plane nodes and workers based on command line input)
+
+    `tkg create cluster test-cluster -p prod --controlplane-size large -w 10 --worker-size extra-large --vsphere-control-endpoint 172.31.3.80`
+
+- Pre-configured node sizes
+    - small = Cpus: 2, Memory: 2048, Disk: 20
+    - medium = Cpus: 2, Memory: 4096, Disk: 40
+    - large = Cpus: 2, Memory: 8192, Disk: 40
+    - extra-large = Cpus: 4, Memory: 16384, Disk: 80
+
+## Working with TKG Workload clusters
+
+### Accessing TKG workload cluster with kubectl
+
+- Get credentials to workload cluster for the first time.  You can either have the credentials merged into the default kubeconfig file in ~/.kube/config or have it exported to a separate file.
+
+**Merge credentials to existing ~/.kube/config**
+
+    `tkg get credentials test-cluster`
+
+**Export credentials to separate kubeconfig file**
+
+    `tkg get credentials test-cluster --kubeconfig tkgkubeconfig`
+
 
