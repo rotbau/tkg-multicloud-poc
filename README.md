@@ -142,17 +142,17 @@ All comands executed from jumpbox where tkg cli is installed
     `tkg get mc` to view management clusters
     You will see all TKG management clusters you've installed from this jumpbox.  The management cluster with the asterisk is the currently set cluster.
 
-    ![alt text](/img/tkg-get-mc.png)
+    ![alt text](/assets/tkg-get-mc.png)
 
 - Set TKG mangement cluster 
     `tkg set mc tkg-mgmt` will set the mc context for the TKG cli.  Any further TKG commands you run will be executed by the selected TKG management cluster.
 
-    ![alt text](/img/tkg-set-mc.png)
+    ![alt text](/assets/tkg-set-mc.png)
 
 - View TKG workload clusters managed by selected TKG management cluster
     `tkg get clusters` or `tkg get clusters --include-management-cluster`
 
-    ![alt text](/img/tkg-set-mc.png)
+    ![alt text](/assets/tkg-set-mc.png)
 
 ### Accessing TKG managemnt cluster nodes using kubectl
 
@@ -165,17 +165,17 @@ example for tkg-mgmt management cluster name
 
     `kubectl config use-context tkg-mgmt-admin@tkg-mgmt`
 
-    ![alt text](/img/kubectl-config.png)
+    ![alt text](/assets/kubectl-config.png)
 
 - View nodes
     `kubectl get nodes`
 
-    ![alt text](/img/kubectl-get-nodes.png)
+    ![alt text](/assets/kubectl-get-nodes.png)
 
 - View namespaces
     `kubectl get ns`
 
-    ![alt text](/img/kubectl-get-ns.png)
+    ![alt text](/assets/kubectl-get-ns.png)
 
 - View all pods
     `kubectl get pods -A`
@@ -194,7 +194,7 @@ Once you have your TKG management cluster created you can create TKG workload cl
 
     *note the controlplane IP is an IP address from the same dhcp network that your nodes are deployed on but outside the dhcp scope.  This IP is used by kube-vip to provide a reliable IP to the workload clusters kubernetes API*
 
-    ![alt text](/img/tkg-create-cluster.png)
+    ![alt text](/assets/tkg-create-cluster.png)
 
 - Create a TKG cluster from prod plan with custom node size and number of worker nodes (3 control plane nodes and workers based on command line input)
 

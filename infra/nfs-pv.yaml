@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nfs-data
+spec:
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteMany
+  mountOptions:
+  - nolock,tcp,noresvport
+  - nfsvers=3
+  nfs:
+    server: 192.168.79.2
+    path: /qnas01_vol1
