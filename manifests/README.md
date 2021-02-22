@@ -45,3 +45,10 @@ Optional: If using Contour Ingress Control, deploy a weighted 80/20 Ingress for 
 ```
 kubectl apply -f hello-weighted-httpproxy.yaml
 ```
+
+## Busybox
+
+Deploy Pod
+```
+kubectl apply -f busybox.yaml
+```

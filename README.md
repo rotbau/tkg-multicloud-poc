@@ -39,7 +39,7 @@ I strongly recommend a Linux VM or MacOS for your jumpbox, however Windows can b
 - Minimum 6 GB of RAM
 - Minimum 2 vCPU (or 2 cores)
 - 200 GB of Disk
-- Desktop Environment recommended for Linux VMs but not required (Gnome, Unity, KDE, MATE, etc)
+- Desktop Environment strongly recommended for Linux VMs but not required (Gnome, Unity, KDE, MATE, etc)
 - Docker CE or Docker Desktop depending on OS (Note RHEL doesn't support Docker CE) - https://docs.docker.com/engine/install/
 - System time synchronized with NTP
 - Git Tools - https://git-scm.com/downloads
@@ -76,8 +76,8 @@ sudo mv ytt* /usr/local/share/ytt
 
 - vCenter >= 6.7u3 or 7.0
 - DHCP subnet presented as vCenter Portgroup (VSS/VDS) for Kubernetes Management and Workload Clusters
-    - Recommend at least a /26
-    - Set aside at least 10 IPs that are part of this subnet (excluded from DHCP scope) that can be manually assigned for Kubernetes API VIP or Application VIP
+    - Recommend a /24 for a POC
+    - Set aside at least 20  (Recommend more) IPs that are part of this subnet (excluded from DHCP scope) that can be manually assigned for Kubernetes API VIP or Application VIP
     - Example (Subnet 192.168.50.0/24, DHCP Scope 192.168.50.10-192.168.50.200, Usable IPs for VIP or LB 192.168.50.201-254)
 - Create Resource Group in vSphere Cluster for TKG VMs - leave settings at default
 - Create VM Folder for TKG VMs and Templates 
