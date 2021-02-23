@@ -210,7 +210,7 @@ Once you have your TKG management cluster created you can create TKG workload cl
 
 In addition to using the TKG cli to create the cluster, you can also use the --config string to create the YAML for cluster creation and then use it in a CIDC system or pipeline instead of the CLI
 
-    `tkg config create cluster test-cluster -p prod --controlplane-size large -w 10 --worker-size extra-large --vsphere-control-endpoint 172.31.3.80 > test-cluster.yaml`
+   `tkg config create cluster test-cluster -p prod --controlplane-size large -w 10 --worker-size extra-large --vsphere-control-endpoint 172.31.3.80 > test-cluster.yaml`
 
 You can then use a CICD system or kubectl to deploy the cluster
 - Set you kubectl context the TKG management cluster in the desired environment `kubectl config use-context tkg-mgmt`
