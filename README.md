@@ -5,7 +5,7 @@ Assumptions:
 
 1. TKG 1.2+
 3. Internet connectivity from jumpbox and vsphere environment
-4. Perimeter firewall is not doing SSL cracking / Cert spoofing for public URLs.  If your firewall is doing this you will need to run an airgap install instead https://gist.github.com/rotbau/a90f79473326a7bd3aeb3afa05a01ab3
+4. Perimeter firewall is not doing SSL cracking / Cert spoofing for public URLs.  If your firewall is doing this you will need to run an airgap install instead https://gist.github.com/rotbau/a90f79473326a7bd3aeb3afa05a01ab3. You can test this by running `openssl s_client -connect registry.tkg.vmware.run:443` .  This should show issuer as digicert and subject *.bintray.com.
 
 Because we have internet connectivity from our vsphere and jumpbox environments images will be pulled from the public VMware repository at registry.tkg.vmware.run
 
@@ -205,6 +205,19 @@ Once you have your TKG management cluster created you can create TKG workload cl
     - medium = Cpus: 2, Memory: 4096, Disk: 40
     - large = Cpus: 2, Memory: 8192, Disk: 40
     - extra-large = Cpus: 4, Memory: 16384, Disk: 80
+
+### Generating Cluster YAML for use with CICD or Kubectl
+
+In addition to using the TKG cli to create the cluster, you can also use the --config string to create the YAML for cluster creation and then use it in a CIDC system or pipeline instead of the CLI
+
+    `tkg config create cluster test-cluster -p prod --controlplane-size large -w 10 --worker-size extra-large --vsphere-control-endpoint 172.31.3.80 > test-cluster.yaml`
+
+You can then use a CICD system or kubectl to deploy the cluster
+- Set you kubectl context the TKG management cluster in the desired environment `kubectl config use-context tkg-mgmt`
+- Apply cluster yaml `kubectl apply -f test-cluster.yaml`
+
+Note: you will still be able to view, scale and upgrade clusters using the TKG cli when they are created using kubectl or CICD tools.
+
 
 ## Working with TKG Workload clusters
 
