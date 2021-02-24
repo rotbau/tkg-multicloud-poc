@@ -85,6 +85,7 @@ sudo mv ytt* /usr/local/share/ytt
 - Optional: Download v1.18.x and v1.17.x OVAs if you want different K8s versions
 - Import OVA into vCenter - leave name as is
 - Convert VM to Template
+- Generate SSH Key to use for TKG nodes `ssh-keygen -t rsa -b 4096 -C "email@example.com"`
 
 
 ## AWS EC2 Infrastructure Perparation
