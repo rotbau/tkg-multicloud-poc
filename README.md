@@ -55,6 +55,7 @@ I strongly recommend a Linux VM or MacOS for your jumpbox, however Windows can b
     - MacOS `curl -LO https://dl.k8s.io/release/v1.19.0/bin/darwin/amd64/kubectl`
     - Windows `curl -LO https://dl.k8s.io/release/v1.19.0/bin/windows/amd64/kubectl.exe`
 - AWS or Azure CLI if you are deploying to public cloud
+- Code editing tool like Visual Studio Code or Notepad++ as examples
 
 Download the binarys above (git, kind, tkg cli, kubectl etc) to your jumpbox and place them in a location that is in your path so they can be ls
 executed from the command line.

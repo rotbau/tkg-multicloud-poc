@@ -5,11 +5,12 @@ metadata:
 spec:
   containers:
   - name: busybox
-    image: busybox:latest
+    image: gcr.io/google-containers/busybox:latest
+#    image: busybox:latest
     command:
       - sleep
       - "3600"
     imagePullPolicy: IfNotPresent
-  imagePullSecrets:
-  - name: regcred
-  restartPolicy: Always
+#  imagePullSecrets:
+#  - name: regcred
+#  restartPolicy: Always
