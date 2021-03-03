@@ -2,23 +2,11 @@
 
 Assorted test Kubernetes applications that can be used for testing Tanzu Kubernetes Grid.
 
-## Tinytools
+## Busybox
 
-Simple pod that includes ping, curl, wget, traceroute commands
-
-Deploy using YAML
+Deploy Pod
 ```
-kubectl apply -f tinytools.yaml
-```
-
-Apply from Kubernetes CLI
-```
-kubectl run tinytools  --image=docker.io/giantswarm/tiny-tools -- sleep 360000
-```
-
-Exec into POD
-```
-kubectl exec -ti tinytools -- sh
+kubectl apply -f busybox.yaml
 ```
 
 ## Hello-World
@@ -46,9 +34,42 @@ Optional: If using Contour Ingress Control, deploy a weighted 80/20 Ingress for 
 kubectl apply -f hello-weighted-httpproxy.yaml
 ```
 
-## Busybox
+## Kuard
 
-Deploy Pod
+Simple
+
+Pod
 ```
-kubectl apply -f busybox.yaml
+kubectl run --restart=Never --image=gcr.io/kuar-demo/kuard-amd64:blue kuard
+kubectl port-forward kuard 8080:8080
 ```
+
+Deployment
+```
+kubectl apply -f kuard/kuard.yaml
+By default the mainifest is set to expose as nodeport to you can check the service using
+kubectl get svc kuard
+```
+
+
+## Tinytools
+
+Simple pod that includes ping, curl, wget, traceroute commands
+
+Deploy using YAML
+```
+kubectl apply -f tinytools.yaml
+```
+
+Apply from Kubernetes CLI
+```
+kubectl run tinytools  --image=docker.io/giantswarm/tiny-tools -- sleep 360000
+```
+
+Exec into POD
+```
+kubectl exec -ti tinytools -- sh
+```
+
+
+

@@ -32,4 +32,4 @@ spec:
   selector:
     app: kuard
   sessionAffinity: None
-  type: ClusterIP  # ClusterIP NodePort LoadBalancer
+  type: NodePort  # ClusterIP NodePort LoadBalancer
