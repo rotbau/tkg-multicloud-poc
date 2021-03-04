@@ -5,6 +5,9 @@ metadata:
   annotations:
     storageclass.kubernetes.io/is-default-class: "true"
 provisioner: csi.vsphere.vmware.com
+#allowVolumeExpansion: true
 parameters:
-#  storagePolicyName: optional
+#  storagePolicyName: "thin-disk"
+#  datastore: "/DATACENTER_NAME/datastore/DATASTORE_NAME"
+#  datastoreurl: "ds:///vmfs/volumes/183e239c-935e4a60/"
 #reclaimPolicy: Retain
