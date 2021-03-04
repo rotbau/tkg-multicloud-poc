@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Secret
 metadata:
-  name: acmefitness-secret
+  name: acmefit
   namespace: default
   labels:
     app: "mariadb"
@@ -9,6 +9,8 @@ metadata:
     release: "wordpress"
 type: Opaque
 data:
+  cart-redis-pass: "VHRHbEZUQTlSVw=="
+  catalog-mongo-pass: "VHRHbEZUQTlSVw=="
   order-postgres-pass: "VHRHbEZUQTlSVw=="
   users-mongo-pass: "V1puNVZPbVR4cw=="
   users-redis-pass: "V1puNVZPbVR4cw=="
@@ -18,14 +20,14 @@ kind: Service
 metadata:
   name: cart-redis
   labels:
-    app: cart-redis
+    app: acmefit
     service: cart-redis
 spec:
   ports:
     - port: 6379
-      name: tcp-redis-cart
+      name: redis-cart
   selector:
-    app: cart-redis
+    app: acmefit
     service: cart-redis
 ---
 apiVersion: apps/v1
@@ -33,49 +35,48 @@ kind: Deployment
 metadata:
   name: cart-redis
   labels:
-    app: cart-redis
+    app: acmefit
     service: cart-redis
+    version: 1.0.0
 spec:
   selector:
     matchLabels:
-      app: cart-redis  # has to match .spec.template.metadata.labels
+      app: acmefit  # has to match .spec.template.metadata.labels
       service: cart-redis
   replicas: 1
   template:
     metadata:
       labels:
-        app: cart-redis  # has to match .spec.selector.matchLabels
+        app: acmefit  # has to match .spec.selector.matchLabels
         service: cart-redis
     spec:
       containers:
         - name: cart-redis
-          image: redis:5.0.3-alpine
-          command:
-            - "redis-server"
+          image: bitnami/redis
           imagePullPolicy: Always
           resources:
             requests:
               cpu: "100m"
               memory: "100Mi"
           ports:
-            - name: tcp-redis
+            - name: redis
               containerPort: 6379
               protocol: "TCP"
           env:
-          - name: REDIS-HOST
+          - name: REDIS_HOST
             value: 'cart-redis'
-          - name: REDIS_PASS
+          - name: REDIS_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: acmefitness-secret
-                key: users-redis-pass
+                name: acmefit
+                key: cart-redis-pass
           volumeMounts:
             - mountPath: /var/lib/redis
-              name: redis-data
+              name: cart-redis-data
 #            - mountPath: /etc/redis
 #              name: redis-config
       volumes:
-        - name: redis-data
+        - name: cart-redis-data
           emptyDir: {}
 #        - name: redis-config
 #          configMap:
@@ -89,7 +90,7 @@ kind: Service
 metadata:
   name: cart
   labels:
-    app: cart
+    app: acmefit
     service: cart
 spec:
   ports:
@@ -97,7 +98,7 @@ spec:
       protocol: TCP
       port: 5000
   selector:
-    app: cart
+    app: acmefit
     service: cart
 ---
 apiVersion: apps/v1
@@ -105,12 +106,12 @@ kind: Deployment
 metadata:
   name: cart
   labels:
-    app: cart
+    app: acmefit
     service: cart
 spec:
   selector:
     matchLabels:
-      app: cart
+      app: acmefit
       service: cart
   strategy:
     type: Recreate
@@ -118,33 +119,44 @@ spec:
   template:
     metadata:
       labels:
-        app: cart
+        app: acmefit
         service: cart
     spec:
       volumes:
-      - name: cart-data
+      - name: acmefit-cart-data
         emptyDir: {}
       containers:
-      - image: gcr.io/vmwarecloudadvocacy/acmeshop-cart:1.0.0
+      - image: gcr.io/vmwarecloudadvocacy/acmeshop-cart:latest
+        imagePullPolicy: "Always"
         name: cart
         env:
         - name: REDIS_HOST
           value: 'cart-redis'
-        - name: REDIS_PASS
+        - name: REDIS_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: acmefitness-secret
-              key: users-redis-pass
+              name: acmefit
+              key: cart-redis-pass
         - name: REDIS_PORT
           value: '6379'
         - name: CART_PORT
           value: '5000'
+        - name: USER_HOST
+          value: 'users'
+        - name: USER_PORT
+          value: '8083'
+        - name: JAEGER_AGENT_HOST
+          value: 'localhost'
+        - name: JAEGER_AGENT_PORT
+          value: '6831'
+        - name: AUTH_MODE
+          value: '1'
         ports:
         - containerPort: 5000
-          name: http-cart
+          name: cart
         volumeMounts:
         - mountPath: "/data"
-          name: "cart-data"
+          name: "acmefit-cart-data"
         resources:
           requests:
             memory: "64Mi"
@@ -174,35 +186,35 @@ kind: Service
 metadata:
   name: catalog-mongo
   labels:
-    app: catalog-mongo
-    service: catalog-mongo
+    app: acmefit
+    service: catalog-db
 spec:
   ports:
     - port: 27017
       name: mongo-catalog
       protocol: TCP
   selector:
-    app: catalog-mongo
-    service: catalog-mongo
+    app: acmefit
+    service: catalog-db
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: catalog-mongo
   labels:
-    app: catalog-mongo
-    service: catalog-mongo
+    app: acmefit
+    service: catalog-db
 spec:
   selector:
     matchLabels:
-      app: catalog-mongo  # has to match .spec.template.metadata.labels
-      service: catalog-mongo
+      app: acmefit  # has to match .spec.template.metadata.labels
+      service: catalog-db
   replicas: 1
   template:
     metadata:
       labels:
-        app: catalog-mongo  # has to match .spec.selector.matchLabels
-        service: catalog-mongo
+        app: acmefit  # has to match .spec.selector.matchLabels
+        service: catalog-db
     spec:
       containers:
         - name: catalog-mongo
@@ -210,7 +222,7 @@ spec:
           resources:
             {}
           ports:
-            - name: mongo-catalog
+            - name: catalog-mongo
               containerPort: 27017
               protocol: "TCP"
           env:
@@ -221,8 +233,8 @@ spec:
           - name: MONGO_INITDB_ROOT_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: acmefitness-secret
-                key: users-mongo-pass
+                name: acmefit
+                key: catalog-mongo-pass
           volumeMounts:
             - mountPath: /data/db
               name: mongodata
@@ -243,7 +255,7 @@ kind: Service
 metadata:
   name: catalog
   labels:
-    app: catalog
+    app: acmefit
     service: catalog
 spec:
   ports:
@@ -251,7 +263,7 @@ spec:
       protocol: TCP
       port: 8082
   selector:
-    app: catalog
+    app: acmefit
     service: catalog
 ---
 apiVersion: apps/v1
@@ -259,30 +271,28 @@ kind: Deployment
 metadata:
   name: catalog
   labels:
-    app: catalog
+    app: acmefit
     service: catalog
-    version: v1
 spec:
   selector:
     matchLabels:
-      app: catalog
+      app: acmefit
       service: catalog
-      version: v1
   strategy:
     type: Recreate
   replicas: 1
   template:
     metadata:
       labels:
-        app: catalog
+        app: acmefit
         service: catalog
-        version: v1
     spec:
       volumes:
-      - name: catalog-data
+      - name: acmefit-catalog-data
         emptyDir: {}
       containers:
-      - image: gcr.io/vmwarecloudadvocacy/acmeshop-catalog:rel1
+      - image: gcr.io/vmwarecloudadvocacy/acmeshop-catalog:latest
+        imagePullPolicy: "Always"
         name: catalog
         env:
         - name: CATALOG_DB_HOST
@@ -290,220 +300,30 @@ spec:
         - name: CATALOG_DB_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: acmefitness-secret
-              key: users-mongo-pass
+              name: acmefit
+              key: catalog-mongo-pass
         - name: CATALOG_DB_PORT
           value: '27017'
         - name: CATALOG_DB_USERNAME
           value: 'mongoadmin'
         - name: CATALOG_PORT
           value: '8082'
-        ports:
-        - containerPort: 8082
-          name: http-catalog
-        volumeMounts:
-        - mountPath: "/data"
-          name: "catalog-data"
-        resources:
-          requests:
-            memory: "64Mi"
-            cpu: "100m"
-          limits:
-            memory: "256Mi"
-            cpu: "500m"
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: shopping
-  labels:
-    app: shopping
-    service: shopping
-spec:
-  ports:
-    - name: http-shopping
-      protocol: TCP
-      port: 3000
-  selector:
-    app: shopping
-    service: shopping
----
-apiVersion: apps/v1 # for versions before 1.8.0 use apps/v1beta1
-kind: Deployment
-metadata:
-  name: shopping
-  labels:
-    app: shopping
-    service: shopping
-spec:
-  selector:
-    matchLabels:
-      app: shopping
-      service: shopping
-  strategy:
-    type: Recreate
-  replicas: 1
-  template:
-    metadata:
-      labels:
-        app: shopping
-        service: shopping
-    spec:
-      containers:
-      - image: gcr.io/vmwarecloudadvocacy/acmeshop-front-end:rel1
-        name: shopping
-        env:
-        - name: FRONTEND_PORT
-          value: '3000'
+        - name: CATALOG_VERSION
+          value: 'v1'
         - name: USERS_HOST
           value: 'users'
-        - name: CATALOG_HOST
-          value: 'catalog'
-        - name: ORDER_HOST
-          value: 'order'
-        - name: CART_HOST
-          value: 'cart'
         - name: USERS_PORT
-          value: '8081'
-        - name: CATALOG_PORT
-          value: '8082'
-        - name: CART_PORT
-          value: '5000'
-        - name: ORDER_PORT
-          value: '6000'
+          value: '8083'
+        - name: JAEGER_AGENT_HOST
+          value: 'localhost'
+        - name: JAEGER_AGENT_PORT
+          value: '6831'
         ports:
-        - containerPort: 3000
-          name: http-shopping
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: order-mongo
-  labels:
-    app: order-mongo
-    service: order-mongo
-spec:
-  ports:
-    - port: 27017
-      name: mongo-order
-      protocol: TCP
-  selector:
-    app: order-mongo
-    service: order-mongo
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: order-mongo
-  labels:
-    app: order-mongo
-    service: order-mongo
-spec:
-  selector:
-    matchLabels:
-      app: order-mongo  # has to match .spec.template.metadata.labels
-      service: order-mongo
-  replicas: 1
-  template:
-    metadata:
-      labels:
-        app: order-mongo  # has to match .spec.selector.matchLabels
-        service: order-mongo
-    spec:
-      containers:
-        - name: order-mongo
-          image: mongo:4
-          resources:
-            {}
-          ports:
-            - name: mongo-order
-              containerPort: 27017
-              protocol: "TCP"
-          env:
-          - name: MONGO_INITDB_ROOT_USERNAME
-            value: 'mongoadmin'
-          - name: MONGO_INITDB_ROOT_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: acmefitness-secret
-                key: order-postgres-pass
-          volumeMounts:
-            - mountPath: /data/db
-              name: mongodata
-      volumes:
-        - name: mongodata
-          emptyDir: {}
-#        - name: mongodata
-#          persistentVolumeClaim:
-#            claimName: mongodata
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: order
-  labels:
-    app: order
-    service: order
-spec:
-  ports:
-    - name: http-order
-      protocol: TCP
-      port: 6000
-  selector:
-    app: order
-    service: order
----
-apiVersion: apps/v1 # for versions before 1.8.0 use apps/v1beta1
-kind: Deployment
-metadata:
-  name: order
-  labels:
-    app: order
-    service: order
-spec:
-  selector:
-    matchLabels:
-      app: order
-      service: order
-  strategy:
-    type: Recreate
-  replicas: 1
-  template:
-    metadata:
-      labels:
-        app: order
-        service: order
-    spec:
-      volumes:
-      - name: order-data
-        emptyDir: {}
-      containers:
-      - image: gcr.io/vmwarecloudadvocacy/acmeshop-order:1.0.1
-        name: order
-        env:
-        - name: ORDER_DB_HOST
-          value: 'order-mongo'
-        - name: ORDER_DB_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: acmefitness-secret
-              key: order-postgres-pass
-        - name: ORDER_DB_PORT
-          value: '27017'
-        - name: ORDER_DB_USERNAME
-          value: 'mongoadmin'
-        - name: ORDER_PORT
-          value: '6000'
-        - name: PAYMENT_PORT
-          value: '9000'
-        - name: PAYMENT_HOST
-          value: 'payment'
-        ports:
-        - containerPort: 6000
-          name: http-order
+        - containerPort: 8082
+          name: catalog
         volumeMounts:
         - mountPath: "/data"
-          name: "order-data"
+          name: "acmefit-catalog-data"
         resources:
           requests:
             memory: "64Mi"
@@ -517,7 +337,7 @@ kind: Service
 metadata:
   name: payment
   labels:
-    app: payment
+    app: acmefit
     service: payment
 spec:
   ports:
@@ -525,7 +345,7 @@ spec:
       protocol: TCP
       port: 9000
   selector:
-    app: payment
+    app: acmefit
     service: payment
 ---
 apiVersion: apps/v1
@@ -533,12 +353,12 @@ kind: Deployment
 metadata:
   name: payment
   labels:
-    app: payment
+    app: acmefit
     service: payment
 spec:
   selector:
     matchLabels:
-      app: payment
+      app: acmefit
       service: payment
   strategy:
     type: Recreate
@@ -546,18 +366,189 @@ spec:
   template:
     metadata:
       labels:
-        app: payment
+        app: acmefit
         service: payment
     spec:
       containers:
-      - image: gcr.io/vmwarecloudadvocacy/acmeshop-payment:1.0.0
+      - image: gcr.io/vmwarecloudadvocacy/acmeshop-payment:latest
         name: payment
         env:
         - name: PAYMENT_PORT
           value: '9000'
+        - name: USERS_HOST
+          value: 'users'
+        - name: USERS_PORT
+          value: '8083'
+        - name: JAEGER_AGENT_HOST
+          value: 'localhost'
+        - name: JAEGER_AGENT_PORT
+          value: '6832'
         ports:
         - containerPort: 9000
-          name: http-payment
+          name: payment
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-postgres
+  labels:
+    app: acmefit
+    service: order-db
+spec:
+  ports:
+    - port: 5432
+      name: postgres-order
+      protocol: TCP
+  selector:
+    app: acmefit
+    service: order-db
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-postgres
+  labels:
+    app: acmefit
+    service: order-db
+spec:
+  selector:
+    matchLabels:
+      app: acmefit
+      service: order-db
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: acmefit
+        service: order-db
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:9.5
+        imagePullPolicy: "Always"
+        ports:
+        - containerPort: 5432
+          name: order-postgres
+          protocol: "TCP"
+        env:
+        - name: POSTGRES_USER
+          value: pgbench
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: acmefit
+              key: order-postgres-pass
+        - name: PGBENCH_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: acmefit
+              key: order-postgres-pass
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data
+          name: postgredb
+      volumes:
+      - name: postgredb
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: order
+  labels:
+    app: acmefit
+    service: order
+spec:
+  ports:
+    - name: http-order
+      protocol: TCP
+      port: 6000
+  selector:
+    app: acmefit
+    service: order
+---
+apiVersion: apps/v1 # for versions before 1.8.0 use apps/v1beta1
+kind: Deployment
+metadata:
+  name: order
+  labels:
+    app: acmefit
+    service: order
+spec:
+  selector:
+    matchLabels:
+      app: acmefit
+      service: order
+  strategy:
+    type: Recreate
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: acmefit
+        service: order
+    spec:
+      volumes:
+      - name: acmefit-order-data
+        emptyDir: {}
+      containers:
+      - image: gcr.io/vmwarecloudadvocacy/acmeshop-order:latest
+        # orderpostgres:latest
+        name: order
+        env:
+        - name: ORDER_DB_HOST
+          value: order-postgres
+        - name: ORDER_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: acmefit
+              key: order-postgres-pass
+        - name: ORDER_DB_PORT
+          value: '5432'
+        - name: AUTH_MODE
+          value: '1'
+        - name: ORDER_DB_USERNAME
+          value: pgbench
+        - name: PGPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: acmefit
+              key: order-postgres-pass
+        - name: ORDER_AUTH_DB
+          value: postgres
+        - name: ORDER_PORT
+          value: '6000'
+        - name: PAYMENT_PORT
+          value: '9000'
+        - name: PAYMENT_HOST
+          value: 'payment'
+        - name: USER_HOST
+          value: 'users'
+        - name: USER_PORT
+          value: '8083'
+        - name: JAEGER_AGENT_HOST
+          value: 'localhost'
+        - name: JAEGER_AGENT_PORT
+          value: '6831'
+        ports:
+        - containerPort: 6000
+          name: order
+        volumeMounts:
+        - mountPath: "/data"
+          name: "acmefit-order-data"
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -579,7 +570,7 @@ kind: Service
 metadata:
   name: users-mongo
   labels:
-    app: users-mongo
+    app: acmefit
     service: users-mongo
 spec:
   ports:
@@ -587,7 +578,7 @@ spec:
       name: mongo-users
       protocol: TCP
   selector:
-    app: users-mongo
+    app: acmefit
     service: users-mongo
 ---
 apiVersion: apps/v1
@@ -595,18 +586,18 @@ kind: Deployment
 metadata:
   name: users-mongo
   labels:
-    app: users-mongo
-    service: users-db
+    app: acmefit
+    service: users-mongo
 spec:
   selector:
     matchLabels:
-      app: users-mongo  # has to match .spec.template.metadata.labels
+      app: acmefit  # has to match .spec.template.metadata.labels
       service: users-mongo
   replicas: 1
   template:
     metadata:
       labels:
-        app: users-mongo  # has to match .spec.selector.matchLabels
+        app: acmefit  # has to match .spec.selector.matchLabels
         service: users-mongo
     spec:
       containers:
@@ -615,7 +606,7 @@ spec:
           resources:
             {}
           ports:
-            - name: mongo-users
+            - name: users-mongo
               containerPort: 27017
               protocol: "TCP"
           env:
@@ -626,7 +617,7 @@ spec:
           - name: MONGO_INITDB_ROOT_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: acmefitness-secret
+                name: acmefit
                 key: users-mongo-pass
           volumeMounts:
             - mountPath: /data/db
@@ -646,17 +637,86 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  name: users-redis
+  labels:
+    app: acmefit
+    service: users-redis
+spec:
+  ports:
+    - port: 6379
+      name: redis-users
+  selector:
+    app: acmefit
+    service: users-redis
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: users-redis
+  labels:
+    app: acmefit
+    service: users-redis
+spec:
+  selector:
+    matchLabels:
+      app: acmefit  # has to match .spec.template.metadata.labels
+      service: users-redis
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: acmefit  # has to match .spec.selector.matchLabels
+        service: users-redis
+    spec:
+      containers:
+        - name: users-redis
+          image: bitnami/redis
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "100Mi"
+          ports:
+            - name: redis
+              containerPort: 6379
+              protocol: "TCP"
+          env:
+          - name: REDIS_HOST
+            value: 'users-redis'
+          - name: REDIS_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: acmefit
+                key: users-redis-pass
+          volumeMounts:
+            - mountPath: /var/lib/redis
+              name: users-redis-data
+#            - mountPath: /etc/redis
+#              name: redis-config
+      volumes:
+        - name: users-redis-data
+          emptyDir: {}
+#        - name: redis-config
+#          configMap:
+#            name: redis-config
+#            items:
+#              - key: redis-config
+#                path: redis.conf
+---
+apiVersion: v1
+kind: Service
+metadata:
   name: users
   labels:
-    app: users
+    app: acmefit
     service: users
 spec:
   ports:
     - name: http-users
       protocol: TCP
-      port: 8081
+      port: 8083
   selector:
-    app: users
+    app: acmefit
     service: users
 ---
 apiVersion: apps/v1
@@ -664,12 +724,12 @@ kind: Deployment
 metadata:
   name: users
   labels:
-    app: users
+    app: acmefit
     service: users
 spec:
   selector:
     matchLabels:
-      app: users
+      app: acmefit
       service: users
   strategy:
     type: Recreate
@@ -677,14 +737,15 @@ spec:
   template:
     metadata:
       labels:
-        app: users
+        app: acmefit
         service: users
     spec:
       volumes:
-      - name: users-data
+      - name: acmefit-users-data
         emptyDir: {}
       containers:
-      - image: gcr.io/vmwarecloudadvocacy/acmeshop-user:1.0.0
+      - image: gcr.io/vmwarecloudadvocacy/acmeshop-user:latest
+        imagePullPolicy: "Always"
         name: users
         env:
         - name: USERS_DB_HOST
@@ -692,20 +753,33 @@ spec:
         - name: USERS_DB_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: acmefitness-secret
+              name: acmefit
               key: users-mongo-pass
         - name: USERS_DB_PORT
           value: '27017'
         - name: USERS_DB_USERNAME
           value: 'mongoadmin'
         - name: USERS_PORT
-          value: '8081'
+          value: '8083'
+        - name: REDIS_HOST
+          value: 'users-redis'
+        - name: REDIS_PORT
+          value: '6379'
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: acmefit
+              key: users-redis-pass
+        - name: JAEGER_AGENT_HOST
+          value: 'localhost'
+        - name: JAEGER_AGENT_PORT
+          value: '6831'
         ports:
-        - containerPort: 8081
-          name: http-users
+        - containerPort: 8083
+          name: users
         volumeMounts:
         - mountPath: "/data"
-          name: "users-data"
+          name: "acmefit-users-data"
         resources:
           requests:
             memory: "64Mi"
@@ -732,7 +806,6 @@ spec:
     app: acmefit
     service: frontend
   type: LoadBalancer
----
 ---
 apiVersion: apps/v1 # for versions before 1.8.0 use apps/v1beta1
 kind: Deployment
@@ -784,3 +857,58 @@ spec:
         ports:
         - containerPort: 3000
           name: frontend
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pos
+  labels:
+    app: acmefit
+    service: pos
+spec:
+  ports:
+    - name: http-pos
+      protocol: TCP
+      port: 7777
+      targetPort: 7777
+      nodePort: 30431
+  selector:
+    app: acmefit
+    service: pos
+  type: NodePort
+---
+apiVersion: apps/v1 # for versions before 1.8.0 use apps/v1beta1
+kind: Deployment
+metadata:
+  name: pos
+  labels:
+    app: acmefit
+    service: pos
+spec:
+  selector:
+    matchLabels:
+      app: acmefit
+      service: pos
+  strategy:
+    type: Recreate
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: acmefit
+        service: pos
+    spec:
+      containers:
+      - image: gcr.io/vmwarecloudadvocacy/acmeshop-pos:v0.1.0-beta
+        name: pos
+        env:
+        - name: HTTP_PORT
+          value: '7777'
+        - name: DATASTORE
+          value: 'REMOTE'
+        - name: FRONTEND_HOST
+          value: 'frontend.default.svc.cluster.local'
+        ports:
+        - containerPort: 7777
+          name: pos
+---
