@@ -2,6 +2,16 @@
 
 Assorted test Kubernetes applications that can be used for testing Tanzu Kubernetes Grid.
 
+## Acme Fitness
+
+Microservice based storefront type application.  Combined into a single yaml file based on https://github.com/vmwarecloudadvocacy/acme_fitness_demo
+
+```
+kubectl apply -f acme-fitness.yaml
+```
+
+To get IP of LoadBalancer for Frontend `kubectl sget svc frontend`
+
 ## Busybox
 
 Deploy Pod
@@ -36,7 +46,7 @@ kubectl apply -f hello-weighted-httpproxy.yaml
 
 ## Kuard
 
-Simple
+Simple test application with 3 replicas.  From Joe Beda's "Kubernetes Up and Running"
 
 Pod
 ```
@@ -47,10 +57,9 @@ kubectl port-forward kuard 8080:8080
 Deployment
 ```
 kubectl apply -f kuard/kuard.yaml
-By default the mainifest is set to expose as nodeport to you can check the service using
-kubectl get svc kuard
 ```
 
+By default the mainifest is set to expose service as LoadBalancer.  Yon get the Kuard service IP using `kubectl get svc kuard`
 
 ## Tinytools
 
@@ -70,6 +79,13 @@ Exec into POD
 ```
 kubectl exec -ti tinytools -- sh
 ```
+## Wordpress
 
+Simple Wordpress deployment using mysql.  Deploys a wordpress pod and mysql pod.
+
+```
+kubectl apply -f wordpress-mysql.yaml
+kubectl apply -f wordpress.yaml
+```
 
 
