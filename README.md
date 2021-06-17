@@ -13,7 +13,7 @@ Because we have internet connectivity from our vsphere and jumpbox environments 
 ## Quicklinks
 
 
-1. [Working with Tanzu CLI](#working-with-tkg-cli)
+1. [Working with Tanzu CLI](#working-with-tanzu-cli)
 2. [Working with the TKG Management cluster](#working-with-the-tkg-management-cluster)
 3. [Creating TKG Workload clusters](#creating-tkg-workload-clusters)
 4. [Working with TKG Workload clusters](#working-with-tkg-workload-clusters)
@@ -62,11 +62,11 @@ executed from the command line.
 
 Installing Tanzu CLI and Plugins:
 ```
+Linux Install
 
 ```
 
 ## vSphere Infrastructure Prepration
-
 
 - vCenter >= 6.7u3 or 7.0
 - DHCP subnet presented as vCenter Portgroup (VSS/VDS) for Kubernetes Management and Workload Clusters (Workload Cluster Network)
@@ -87,10 +87,10 @@ Kubernetes v1.20.5: Photon v3 Kubernetes v1.20.5 OVA
 - Traffic allowed on port TCP 6443 from local bootstrap (jumpbox) and Workload Cluster network
 - Time in sync on all ESXi hosts
 - Generate SSH Key to use for TKG nodes `ssh-keygen -t rsa -b 4096 -C "email@example.com"`
+- SSH to vcenter and run `openssl x509 -in /etc/vmware-vpx/ssl/rui.crt -fingerprint -sha1 -noout`
 
 
 ## AWS EC2 Infrastructure Perparation
-
 
 - Access key and access key secret for an active AWS account
 - Your AWS account must have Administrator privileges
@@ -102,8 +102,8 @@ Kubernetes v1.20.5: Photon v3 Kubernetes v1.20.5 OVA
 - Traffic allowed on port TCP 443 from local bootstrap and VMare registry (registry.tkg.vmware.run)
 - Generate SSH Key to use for TKG nodes `ssh-keygen -t rsa -b 4096 -C "email@example.com"`
 
-## Azure Infrastructure Requirements
 
+## Azure Infrastructure Requirements
 
 - Microsoft Azure account
     - permissions to deploy and app
@@ -115,10 +115,12 @@ Kubernetes v1.20.5: Photon v3 Kubernetes v1.20.5 OVA
 - VNET will be created or optionally you can choose existing provided there is suffcient capacity
 - Generate SSH Key to use for TKG nodes `ssh-keygen -t rsa -b 4096 -C "email@example.com"`
 
+
 ## VMC on AWS or Azure VMware Solution
 
 - Jumpbox is required to be located in VMC or AVS environment.  Prepare using same requirements as listed [Jumpbox Requirements](#jumpbox-requirements) section.
 - Follow official documentation for additional preparation steps https://docs.vmware.com/en/VMware-Tanzu-Kubernetes-Grid/1.3/vmware-tanzu-kubernetes-grid-13/GUID-mgmt-clusters-prepare-maas.html
+
 
 
 ## Management Cluster Installation
@@ -139,6 +141,7 @@ Headless UI Install:
 From your jumpbox issue `tanzu` from the command line.  This will show you all of the commands available from the TKG CLI.
 
 Reference Documentation: https://docs.vmware.com/en/VMware-Tanzu-Kubernetes-Grid/1.3/vmware-tanzu-kubernetes-grid-13/GUID-tanzu-cli-reference.html
+
 
 ## Working with the TKG Management cluster
 
@@ -162,6 +165,7 @@ All comands executed from jumpbox where tanzu cli is installed
     `tkg get clusters` or `tkg get clusters --include-management-cluster`
 
     ![alt text](/assets/tkg-set-mc.png)
+
 
 ### Accessing TKG managemnt cluster nodes using kubectl
 
@@ -192,6 +196,7 @@ example for tkg-mgmt management cluster name
 - View pods in a specific namespace
     `kubectl get pods -n kube-system`
 
+
 ## Creating TKG Workload clusters
 
 Once you have your TKG management cluster created you can create TKG workload clusters for your applications.  You can leverage the TKG cli to create clusters.
@@ -214,6 +219,7 @@ Once you have your TKG management cluster created you can create TKG workload cl
     - medium = Cpus: 2, Memory: 4096, Disk: 40
     - large = Cpus: 2, Memory: 8192, Disk: 40
     - extra-large = Cpus: 4, Memory: 16384, Disk: 80
+
 
 ### Generating Cluster YAML for use with CICD or Kubectl
 
