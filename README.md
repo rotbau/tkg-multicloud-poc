@@ -3,7 +3,7 @@ This guide covers some basic POC pre-requisites and general setup for Tanzu Kube
 
 Assumptions:
 
-1. TKG 1.2+
+1. TKG 1.3.1
 3. Internet connectivity from jumpbox and vsphere environment
 4. Perimeter firewall is not doing SSL cracking / Cert spoofing for public URLs.  If your firewall is doing this you will need to run an airgap install instead https://gist.github.com/rotbau/a90f79473326a7bd3aeb3afa05a01ab3. You can test this by running `openssl s_client -connect registry.tkg.vmware.run:443` .  This should show issuer as digicert and subject *.bintray.com.
 
@@ -13,7 +13,7 @@ Because we have internet connectivity from our vsphere and jumpbox environments 
 ## Quicklinks
 
 
-1. [Working with TKG CLI](#working-with-tkg-cli)
+1. [Working with Tanzu CLI](#working-with-tkg-cli)
 2. [Working with the TKG Management cluster](#working-with-the-tkg-management-cluster)
 3. [Creating TKG Workload clusters](#creating-tkg-workload-clusters)
 4. [Working with TKG Workload clusters](#working-with-tkg-workload-clusters)
@@ -25,7 +25,7 @@ Because we have internet connectivity from our vsphere and jumpbox environments 
 
 This POC guide is meant to supplement the official VMware documentation.  Always consult the latest VMware documentation.
 
-https://docs.vmware.com/en/VMware-Tanzu-Kubernetes-Grid/1.2/vmware-tanzu-kubernetes-grid-12/GUID-index.html
+https://docs.vmware.com/en/VMware-Tanzu-Kubernetes-Grid/1.3/vmware-tanzu-kubernetes-grid-13/GUID-index.html
 
 
 ## Jumpbox Requirements
@@ -47,7 +47,7 @@ I strongly recommend a Linux VM or MacOS for your jumpbox, however Windows can b
 - Kind Binary - https://github.com/kubernetes-sigs/kind/releases
 - TKG CLI - https://www.vmware.com/go/get-tkg 
     - Click **Go to Downloads**
-    - Make Sure **Select Version** pull down is 1.2.1
+    - Make Sure **Select Version** pull down is 1.3.x
     - Download the **VMware Tanzu Kubernetes Grid CLI** for your Jumpbox OS
     - Log in with your My VMware credentials
 - Kubectl 
@@ -117,7 +117,7 @@ sudo mv ytt* /usr/local/share/ytt
 ## VMC on AWS or Azure VMware Solution
 
 - Jumpbox is required to be located in VMC or AVS environment.  Prepare using same requirements as listed [Jumpbox Requirements](#jumpbox-requirements) section.
-- Follow official documentation for additional preparation steps https://docs.vmware.com/en/VMware-Tanzu-Kubernetes-Grid/1.2/vmware-tanzu-kubernetes-grid-12/GUID-prepare-maas.html#prep-vmc
+- Follow official documentation for additional preparation steps https://docs.vmware.com/en/VMware-Tanzu-Kubernetes-Grid/1.3/vmware-tanzu-kubernetes-grid-13/GUID-mgmt-clusters-prepare-maas.html
 
 
 ## Management Cluster Installation
@@ -126,12 +126,12 @@ sudo mv ytt* /usr/local/share/ytt
 Follow official documentation [linked here](#documentation)
 
 
-## Working with TKG cli
+## Working with Tanzu CLI
 
 
-From your jumpbox issue `tkg` from the command line.  This will show you all of the commands available from the TKG CLI.
+From your jumpbox issue `tanzu` from the command line.  This will show you all of the commands available from the TKG CLI.
 
-Reference Documentation: https://docs.vmware.com/en/VMware-Tanzu-Kubernetes-Grid/1.2/vmware-tanzu-kubernetes-grid-12/GUID-tkg-cli-reference.html
+Reference Documentation: https://docs.vmware.com/en/VMware-Tanzu-Kubernetes-Grid/1.3/vmware-tanzu-kubernetes-grid-13/GUID-tanzu-cli-reference.html
 
 ## Working with the TKG Management cluster
 
