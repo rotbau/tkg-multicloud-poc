@@ -60,32 +60,32 @@ I strongly recommend a Linux VM or MacOS for your jumpbox, however Windows can b
 Download the binarys above (git, kind, tkg cli, kubectl etc) to your jumpbox and place them in a location that is in your path so they can be ls
 executed from the command line.
 
-Example Commands:
+Installing Tanzu CLI and Plugins:
 ```
-gunzip tkg-linux-amd64-v1.2.1-vmware.1.tar.gz && tar -xvf tkg-linux-amd64-v1.2.1-vmware.1.tar
-cd tkg
-chmod +x *
-sudo mv tkg* /usr/local/share/tkg
-sudo mv kbld* /usr/local/share/kbld
-sudo mv kapp* /usr/local/share/kapp
-sudo mv imgpkg* /usr/local/share/imgpkg
-sudo mv ytt* /usr/local/share/ytt
+
 ```
 
 ## vSphere Infrastructure Prepration
 
 
 - vCenter >= 6.7u3 or 7.0
-- DHCP subnet presented as vCenter Portgroup (VSS/VDS) for Kubernetes Management and Workload Clusters
+- DHCP subnet presented as vCenter Portgroup (VSS/VDS) for Kubernetes Management and Workload Clusters (Workload Cluster Network)
     - Recommend a /24 for a POC
     - Set aside at least 20  (Recommend more) IPs that are part of this subnet (excluded from DHCP scope) that can be manually assigned for Kubernetes API VIP or Application VIP
     - Example (Subnet 192.168.50.0/24, DHCP Scope 192.168.50.10-192.168.50.200, Usable IPs for VIP or LB 192.168.50.201-254)
 - Create Resource Group in vSphere Cluster for TKG VMs - leave settings at default
 - Create VM Folder for TKG VMs and Templates 
-- Download Photon v3 Kubernetes v1.19.3 OVA - https://www.vmware.com/go/get-tkg
+- Download Photon v3 or Ubuntu Kubernetes for the version of tanzu we are installing (ex 1.3.1 using v1.20.5) - https://www.vmware.com/go/get-tkg
+```
+Kubernetes v1.20.5: Ubuntu v20.04 Kubernetes v1.20.5 OVA
+Kubernetes v1.20.5: Photon v3 Kubernetes v1.20.5 OVA
+```
 - Optional: Download v1.18.x and v1.17.x OVAs if you want different K8s versions
 - Import OVA into vCenter - leave name as is
 - Convert VM to Template
+- Traffic allowed out to vCenter Server 443 from the Workload Cluster network
+- Traffic allowed on port TCP 6443 from local bootstrap (jumpbox) and Workload Cluster network
+- Time in sync on all ESXi hosts
 - Generate SSH Key to use for TKG nodes `ssh-keygen -t rsa -b 4096 -C "email@example.com"`
 
 
@@ -100,7 +100,7 @@ sudo mv ytt* /usr/local/share/ytt
 - AWS CLI installed locally on  Jumpbox
 - Traffic allowed on port TCP 6443 from local bootstrap (jumpbox) and AWS
 - Traffic allowed on port TCP 443 from local bootstrap and VMare registry (registry.tkg.vmware.run)
-
+- Generate SSH Key to use for TKG nodes `ssh-keygen -t rsa -b 4096 -C "email@example.com"`
 
 ## Azure Infrastructure Requirements
 
@@ -113,6 +113,7 @@ sudo mv ytt* /usr/local/share/ytt
 - Traffic allowed on port TCP 6443 from local bootstrap (jumpbox) and Azure
 - Traffic allowed on port TCP 443 from local bootstrap and VMare registry (registry.tkg.vmware.run)
 - VNET will be created or optionally you can choose existing provided there is suffcient capacity
+- Generate SSH Key to use for TKG nodes `ssh-keygen -t rsa -b 4096 -C "email@example.com"`
 
 ## VMC on AWS or Azure VMware Solution
 
@@ -125,6 +126,12 @@ sudo mv ytt* /usr/local/share/ytt
 
 Follow official documentation [linked here](#documentation)
 
+Example using UI:
+`tanzu management-cluster create my-mgmt-cluster --ui`
+
+Headless UI Install:
+`tanzu management-cluster create my-mgmt-cluster --ui --bind [jumpbox IP when command is run]:8181 --browser none`
+
 
 ## Working with Tanzu CLI
 
@@ -135,9 +142,9 @@ Reference Documentation: https://docs.vmware.com/en/VMware-Tanzu-Kubernetes-Grid
 
 ## Working with the TKG Management cluster
 
-After you install the management cluster(s) for the desired environments.  You can use the TKG cli to view TKG management clusters and create and view TKG workload clusters. 
+After you install the management cluster(s) for the desired environments.  You can use the Tanzu cli to view TKG management clusters and create and view TKG workload clusters. 
 
-All comands executed from jumpbox where tkg cli is installed
+All comands executed from jumpbox where tanzu cli is installed
 
 ### View and Select TKG management clusters using TKG cli
 - View TKG management clusters
